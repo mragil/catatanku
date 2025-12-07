@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit'
+import { redirect, invalid } from '@sveltejs/kit'
 import { form, getRequestEvent, query } from '$app/server'
 import { auth } from '$lib/server/auth'
 import { signupSchema, loginSchema } from '$lib/schema/auth'
@@ -10,7 +10,12 @@ export const signup = form(signupSchema, async (user) => {
 
 export const login = form(loginSchema, async (user) => {
 	const { request } = getRequestEvent();
-	await auth.api.signInEmail({ body: user, headers: request.headers });
+	try {
+		await auth.api.signInEmail({ body: user, headers: request.headers });
+	} catch (e) {
+		console.log(e);
+		invalid('Invalid email or password');
+	}
 	redirect(303, '/notes');
 });
 

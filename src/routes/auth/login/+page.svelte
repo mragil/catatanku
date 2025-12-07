@@ -6,6 +6,10 @@
 	<h1>Log in</h1>
 
 	<form {...login}>
+			{#each login.fields.allIssues()?.filter(issue => issue.path.length === 0) ?? [] as issue}
+				{console.log(issue)}
+				<p class="issue">{issue.message}</p>
+			{/each}
 		<label>
 			Email
 			<input {...login.fields.email.as('email')} />

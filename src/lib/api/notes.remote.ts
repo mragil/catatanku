@@ -1,4 +1,4 @@
-import * as v from 'valibot';
+import { z } from 'zod/mini'
 
 import { invalid } from '@sveltejs/kit';
 
@@ -25,7 +25,7 @@ export const getNotes = query(async () => {
 	return db;
 });
 
-export const getNoteById = query(v.string(), async (id: string) => {
+export const getNoteById = query(z.string(), async (id: string) => {
 	const note = db.find(n => n.id === id);
 
 	if (!note) {
@@ -36,7 +36,7 @@ export const getNoteById = query(v.string(), async (id: string) => {
 });
 
 export const createNote = form(
-	v.object({ title: v.string(), content: v.string() }),
+	z.object({ title: z.string(), content: z.string() }),
 	async (data, issue) => {
 		if(db.find(n => n.title === data.title)) {
 			invalid(issue.title('Title already exists'));

@@ -1,32 +1,12 @@
-import * as v from 'valibot';
+import { z } from 'zod/mini'
 
-export const signupSchema = v.object({
-  name: v.pipe(
-    v.string(),
-    v.nonEmpty('Please enter your name.'),
-    v.minLength(4, 'Your name must have 4 characters or more.')
-  ),
-  email: v.pipe(
-    v.string(),
-    v.nonEmpty('Please enter your email.'),
-    v.email('The email address is badly formatted.')
-  ),
-  password: v.pipe(
-    v.string(),
-    v.nonEmpty('Please enter your password.'),
-    v.minLength(8, 'Your password must have 8 characters or more.')
-  ),
-});
+export const signupSchema = z.object({
+	name: z.string().check(z.minLength(4)),
+	email: z.email(),
+	password: z.string().check(z.minLength(8)),
+})
 
-export const loginSchema = v.object({
-  email: v.pipe(
-    v.string(),
-    v.nonEmpty('Please enter your email.'),
-    v.email('The email address is badly formatted.')
-  ),
-  password: v.pipe(
-    v.string(),
-    v.nonEmpty('Please enter your password.'),
-    v.minLength(8, 'Your password must have 8 characters or more.')
-  ),
-});
+export const loginSchema = z.object({
+	email: z.email(),
+	password: z.string().check(z.minLength(8)),
+})
