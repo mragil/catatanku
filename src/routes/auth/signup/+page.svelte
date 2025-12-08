@@ -1,35 +1,69 @@
 <script lang="ts">
-	import { signup } from '$lib/api/auth.remote'
+	import { slide } from 'svelte/transition';
+
+	import { signup } from '$lib/api/auth.remote';
+	import { cn } from '$lib/utils/cn';
 </script>
 
-<div class="auth">
-	<h1>Sign up</h1>
+<div class="">
+	<h1 class="mb-14 text-center">Sign up to save your note</h1>
 
-	<form {...signup}>
+	<form {...signup} class="grid gap-5 grid-rows-3 items-center justify-center">
 		<label>
-			Username
-			<input {...signup.fields.name.as('text')} />
+			<input
+				{...signup.fields.name.as('text')}
+				placeholder="Name"
+				oninput={() => signup.validate()}
+				class={cn(
+					'w-full md:w-96 rounded-lg border-b-8 p-4 pe-12 text-md bg-transparent',
+					signup.fields?.name?.issues()?.length ?? 0 > 0
+						? 'border-red-500'
+						: 'border-black'
+				)}
+			/>
 			{#each signup.fields.name.issues() ?? [] as issue}
-				<p class="issue">{issue.message}</p>
+				<p class="issue text-red-500 mt-2" transition:slide>{issue.message}</p>
 			{/each}
 		</label>
 
 		<label>
-			Email
-			<input {...signup.fields.email.as('text')} />
+			<input
+				{...signup.fields.email.as('text')}
+				placeholder="Email"
+				oninput={() => signup.validate()}
+				class={cn(
+					'w-full md:w-96 rounded-lg border-b-8 p-4 pe-12 text-md bg-transparent',
+					signup.fields?.email?.issues()?.length ?? 0 > 0
+						? 'border-red-500'
+						: 'border-black'
+				)}
+			/>
 			{#each signup.fields.email.issues() ?? [] as issue}
-				<p class="issue">{issue.message}</p>
+				<p class="issue text-red-500 mt-2" transition:slide>{issue.message}</p>
 			{/each}
 		</label>
 
 		<label>
-			Password
-			<input {...signup.fields.password.as('password')} />
+			<input
+				{...signup.fields.password.as('password')}
+				type="password"
+				oninput={() => signup.validate()}
+				placeholder="Password"
+				class={cn(
+					'w-full md:w-96 rounded-lg border-b-8 p-4 pe-12 text-md bg-transparent',
+					signup.fields?.password?.issues()?.length ?? 0 > 0
+						? 'border-red-500'
+						: 'border-black'
+				)}
+			/>
+
 			{#each signup.fields.password.issues() ?? [] as issue}
-				<p class="issue">{issue.message}</p>
+				<p class="issue text-red-500 mt-2" transition:slide>{issue.message}</p>
 			{/each}
 		</label>
-
-		<button type="submit">Sign up</button>
+		{#each signup.fields.allIssues()?.filter((issue) => issue.path.length === 0) ?? [] as issue}
+			<p class="issue text-red-500 text-center" transition:slide>{issue.message}</p>
+		{/each}
+		<button type="submit" class="p-4 border-black border-2 rounded-xl">Sign up</button>
 	</form>
 </div>
