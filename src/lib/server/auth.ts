@@ -7,7 +7,6 @@ import { getRequestEvent } from '$app/server'
 import { db } from "./db";
 
 export const auth = betterAuth({
-  secret: 'pT6RaptK51yklWGeVimPbVm8RlmO87Uz',
   database: drizzleAdapter(db, {
     provider: "sqlite"
   }),
