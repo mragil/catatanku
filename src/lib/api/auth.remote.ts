@@ -2,19 +2,34 @@ import { redirect, invalid } from '@sveltejs/kit'
 import { form, getRequestEvent, query } from '$app/server'
 import { auth } from '$lib/server/auth'
 import { signupSchema, loginSchema } from '$lib/schema/auth'
+import { APIError } from "better-auth";
+
 
 export const signup = form(signupSchema, async (user) => {
-	await auth.api.signUpEmail({ body: user });
-	redirect(307, `/notes`);
+	try {
+		await auth.api.signUpEmail({ body: user });
+		redirect(307, `/notes`);
+	} catch (error) {
+		console.log(error);
+		let errorMessage = 'Failed to create account';
+		if(error instanceof APIError) {
+			errorMessage = error.message;
+		}
+		invalid(errorMessage);
+	}
 });
 
 export const login = form(loginSchema, async (user) => {
 	const { request } = getRequestEvent();
 	try {
 		await auth.api.signInEmail({ body: user, headers: request.headers });
-	} catch (e) {
-		console.log(e);
-		invalid('Invalid email or password');
+	} catch (error) {
+		console.log(error);
+		let errorMessage = 'Invalid email or password';
+		if(error instanceof APIError) {
+			errorMessage = error.message;
+		}
+		invalid(errorMessage);
 	}
 	redirect(303, '/notes');
 });

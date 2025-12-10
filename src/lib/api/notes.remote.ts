@@ -21,7 +21,10 @@ const db = [
   }
 ];
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export const getNotes = query(async () => {
+  delay(5000);
 	return db;
 });
 

@@ -4,10 +4,10 @@
 	import AddNotes from "./AddNotes.svelte";
   import ListNotes from "./ListNotes.svelte";
 
-	const user = await getUser()
+	const user = await getUser();
 </script>
 
-<p>Welcome, {user.name}!</p>
+<p>Welcome {user.name}!</p>
 <ListNotes />
 <AddNotes />
 
