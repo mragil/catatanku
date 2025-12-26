@@ -8,15 +8,15 @@ import { APIError } from "better-auth";
 export const signup = form(signupSchema, async (user) => {
 	try {
 		await auth.api.signUpEmail({ body: user });
-		redirect(307, `/notes`);
 	} catch (error) {
-		console.log(error);
+		console.log('ini err: ',error);
 		let errorMessage = 'Failed to create account';
 		if(error instanceof APIError) {
 			errorMessage = error.message;
 		}
 		invalid(errorMessage);
 	}
+	redirect(307, `/notes`);
 });
 
 export const login = form(loginSchema, async (user) => {
