@@ -94,7 +94,7 @@ export const verification = sqliteTable(
 export const notes = sqliteTable(
   "notes",
   {
-    id: text("id").primaryKey(),
+	id: integer('id').primaryKey({ autoIncrement: true }),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),

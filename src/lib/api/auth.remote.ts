@@ -31,6 +31,7 @@ export const login = form(loginSchema, async (user) => {
 		}
 		invalid(errorMessage);
 	}
+
 	redirect(303, '/notes');
 });
 
@@ -42,6 +43,7 @@ export const signout = form(async () => {
 
 export const getUser = query(async () => {
 	const { locals } = getRequestEvent();
+
 	if (!locals.user) {
 		redirect(307, '/auth/login');
 	}

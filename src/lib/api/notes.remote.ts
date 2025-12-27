@@ -1,35 +1,34 @@
 import { z } from 'zod/mini'
 
-import { invalid } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 
-import { query, form } from '$app/server';
+import { query, form, getRequestEvent } from '$app/server';
+import { db } from '$lib/server/db'
+import * as table from '$lib/server/db/schema';
+import { and, eq } from 'drizzle-orm';
+import { createNoteSchema } from '$lib/schema/notes';
 
-const db = [
-  {
-    "id": "1",
-    "title": "My first note",
-    "content": "This is the content of my first note.",
-    "createdAt": "2025-12-05T12:00:00Z",
-    "lastEditedAt": "2025-12-05T10:00:00Z"
-  },
-  {
-    "id": "2",
-    "title": "Shopping list",
-    "content": "Milk, Bread, Eggs, Butter",
-    "createdAt": "2025-12-02T15:30:00Z",
-    "lastEditedAt": "2025-12-02T16:30:00Z"
-  }
-];
+function requireAuth() {
+	const { locals } = getRequestEvent()
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+	if (!locals.user) {
+		redirect(307, '/auth/login')
+	}
+
+	return locals.user
+}
 
 export const getNotes = query(async () => {
-  delay(5000);
-	return db;
+  const user = requireAuth();
+	return db.select().from(table.notes).where(eq(table.notes.userId, user.id));
 });
 
-export const getNoteById = query(z.string(), async (id: string) => {
-	const note = db.find(n => n.id === id);
+export const getNoteById = query(z.number(), async (id: number) => {
+  const user = requireAuth();
+	const note = await db.select().from(table.notes).where(and(
+    eq(table.notes.id, id),
+    eq(table.notes.userId, user.id)
+  )).then((res) => res[0]);
 
 	if (!note) {
 		throw new Error('Note not found');
@@ -38,12 +37,14 @@ export const getNoteById = query(z.string(), async (id: string) => {
 	return note;
 });
 
-export const createNote = form(
-	z.object({ title: z.string(), content: z.string() }),
-	async (data, issue) => {
-		if(db.find(n => n.title === data.title)) {
-			invalid(issue.title('Title already exists'));
-		}
-		db.push({...data, createdAt: new Date().toISOString(), lastEditedAt: new Date().toISOString(), id: String(db.length + 1)});
+export const createNote = form(createNoteSchema,
+	async (data) => {
+    const user = requireAuth();
+    const note = await db.insert(table.notes).values({
+      ...data,
+      userId: user.id,
+    }).returning().then((res) => res[0]);
+
+    throw redirect(303, `/notes/${note.id}`);
 	}
 );
